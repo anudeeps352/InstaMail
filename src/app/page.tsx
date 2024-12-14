@@ -11,6 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import {
   Select,
@@ -46,6 +47,7 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       productName: '',
+      cta: 'Welcome Email',
     },
   });
 
@@ -129,6 +131,7 @@ export default function Home() {
                       <FormDescription>
                         This is your product name.
                       </FormDescription>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -148,6 +151,7 @@ export default function Home() {
                       <FormDescription>
                         This is your product description.
                       </FormDescription>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -184,6 +188,7 @@ export default function Home() {
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
