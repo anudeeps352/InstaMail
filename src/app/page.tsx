@@ -1,101 +1,208 @@
-import Image from "next/image";
+'use client';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+
+import Navbar from '@/components/navbar';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+
+const formSchema = z.object({
+  productName: z.string().min(1, {
+    message: 'Productname must be at least 1 characters.',
+  }),
+  productDescription: z.string().min(1, {
+    message: 'Productname must be at least 1 characters.',
+  }),
+  cta: z.string().min(1, {
+    message: 'Productname must be at least 1 characters.',
+  }),
+});
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [content, setContent] = useState('');
+  const { toast } = useToast();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      productName: '',
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const response = await fetch('/api/emails/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      const data = await response.json();
+      setContent(data.emailDraft);
+    } catch (error) {
+      console.error('Failed to submit request:', error);
+    }
+  }
+
+  const handleChangeTextArea = (value: string) => {
+    setContent(value);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      toast({
+        title: 'Success',
+        description: 'Text copied to clipboard!',
+        variant: 'default',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: `Failed to copy text! ${error}`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <main className="flex flex-col items-center justify-center">
+      <Navbar />
+      <div className="lg:grid lg:grid-rows-[1fr 3fr] items-center justify-center w-[80%] min-h-screen p-8 pb-20 gap-16 font-[family-name:var(--font-geist-sans)]">
+        <div className="flex flex-col gap-11 items-center">
+          <div className="flex gap-6 grow">
+            <h1 className="text-5xl  text-center mr-auto font-semibold lg:text-9xl">
+              Craft Smarter Emails Faster with{' '}
+              <span className="font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-red-300 to-yellow-200">
+                INSTA MAIL
+              </span>
+            </h1>
+          </div>
+          <p className="text-1xl w-[70%] text-center lg:text-2xl">
+            Looking to write professional, polished emails more efficiently and
+            boost response rates?
+            <br /> Our free AI-powered email writing tool, trained on
+            top-performing email templates, is designed to help you do just
+            that. It simplifies the process of automating your email outreach at
+            scale.
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="flex flex-col lg:flex-row w-full justify-around ">
+          <div className="p-4 lg:w-1/4">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <FormField
+                  control={form.control}
+                  name="productName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        This is your product name.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="productDescription"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder=""
+                          {...field}
+                          className="h-24 lg:min-h-[10rem] leading-tight  resize-none"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        This is your product description.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="cta"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CTA</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || 'Welcome Email'}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Call to Action of Mail" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Welcome Email">
+                              Welcome Email
+                            </SelectItem>
+                            <SelectItem value="Follow Up Email">
+                              Follow Up Email
+                            </SelectItem>
+                            <SelectItem value="Schedule a call using a calendly link">
+                              Schedule a call using a calendly link
+                            </SelectItem>
+                            <SelectItem value="Reply back with Ideal Time">
+                              Reply back with their Ideal Time
+                            </SelectItem>
+                            <SelectItem value="Reply with feedback">
+                              Reply with feedback
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit">Submit</Button>
+              </form>
+            </Form>
+          </div>
+          <div className="flex flex-col lg:w-2/4 p-4 gap-8">
+            <Textarea
+              placeholder="Submit Request to see result"
+              value={content}
+              onChange={(e) => handleChangeTextArea(e.target.value)}
+              className="lg:h-full h-56"
+            />
+
+            <Button onClick={handleCopy}>Copy To Clipboard</Button>
+          </div>
+        </div>
+      </div>
+    </main>
   );
 }

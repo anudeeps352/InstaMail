@@ -1,0 +1,7 @@
+{
+  "Welcome Email": "Write a friendly and professional welcome email to {recipient}, introducing our service.",
+  "Follow Up Email": "Write a polite follow-up email to {recipient} regarding our previous conversation about {subject}.",
+  "Schedule a call using a calendly link": "Write an email to {recipient} suggesting a call using a Calendly link to schedule a meeting.",
+  "Reply back with Ideal Time": "Write an email to {recipient} asking for their ideal time to meet or talk.",
+  "Reply with feedback": "Write an email to {recipient} asking for feedback on their recent experience with {product/service}."
+}
